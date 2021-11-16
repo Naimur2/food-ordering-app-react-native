@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet, View } from "react-native";
 import RenderImage from "../../../../../common/RenderImage";
 import IncrementDecrement from "../../components/IncrementDecrement";
@@ -6,10 +6,27 @@ import AddToCartButton from "./AddToCartButton";
 import Description from "./Description";
 import Header from "./Header";
 import Offers from "./Offers";
+import CustomerContext from "../../../../../contexts/customer-context";
+import DataContext from "../../../../../contexts/data-context";
 
 export default function FoodDetails({ route, navigation }) {
+    const customerCtx = React.useContext(CustomerContext);
     const params = route.params;
     const image = `uploads/${params.images[0]}`;
+    const dataCtx = useContext(DataContext);
+    const userPro = dataCtx.user;
+
+    const [counter, setCounter] = useState(1);
+
+
+
+    const item = {
+        productId: params._id,
+        quantity: counter,
+        price: params.price,
+        deliveryCharge: params.deliveryCharge,
+    };
+
     return (
         <View style={styles.container}>
             <View>
@@ -20,8 +37,24 @@ export default function FoodDetails({ route, navigation }) {
                     <Description style={styles} data={params} />
                 </View>
             </View>
-            <IncrementDecrement min="1" max="5" />
-            <AddToCartButton style={styles} />
+            <View
+                style={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <IncrementDecrement
+                    containerStyle={{ width: 300 }}
+                    onChange={setCounter}
+                    min={params.min || "1"}
+                    max={params.max || "5"}
+                />
+            </View>
+            <AddToCartButton
+                onPress={() => customerCtx.addToCart(item)}
+                style={styles}
+            />
         </View>
     );
 }

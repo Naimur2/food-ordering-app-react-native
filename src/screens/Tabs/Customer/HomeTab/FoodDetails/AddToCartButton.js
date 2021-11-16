@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { View,TouchableOpacity } from "react-native";
 import { Button } from "react-native-elements";
 
 const AddToCartButton = ({ style: styles, onPress }) => {

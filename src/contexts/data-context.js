@@ -3,11 +3,13 @@ import React from 'react';
 const DataContext= React.createContext({
     data: [],
     category: [],
-    isLoading: true,
-    isLoggedIn: false,
+    user: {},
+    isLoading: null,
+    isLoggedIn: null,
     error: null,
-    getData: () => {},
+    setData: () => {},
     deleteData: () => {},
+    onLogOut: () => {},
 });
 
 export default DataContext;

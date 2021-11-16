@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import FoodDetails from "../FoodDetails/FoodDetails";
-import HomeScreen from "../HomeScreen";
+import FoodDetails from "./FoodDetails/FoodDetails";
+import HomeScreen from "./HomeScreen";
 import React from "react";
 
 const HomeStack = createNativeStackNavigator();

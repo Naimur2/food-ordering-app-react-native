@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text,TouchableHighlight } from "react-native";
 
 
 export default function PressAbleButton({title, onPress, buttonStyle:style,titleStyle}) {
@@ -7,8 +7,8 @@ export default function PressAbleButton({title, onPress, buttonStyle:style,title
     const btnTitle=title ? title : 'Press me';
     const titlestyle = titleStyle ? titleStyle : {color:textColor};
     return (
-        <Pressable style={style} onPress={onPress}>
+        <TouchableHighlight style={style} onPress={onPress}>
             <Text style={titlestyle} >{btnTitle}</Text>
-        </Pressable>
+        </TouchableHighlight>
     );
 }

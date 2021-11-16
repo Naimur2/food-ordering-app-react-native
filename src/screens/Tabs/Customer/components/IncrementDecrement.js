@@ -1,76 +1,133 @@
 import React, { useState } from "react";
-import {  StyleSheet, Text, View, } from "react-native";
-
+import { StyleSheet, Text, View,Button, } from "react-native";
 import PressAbleButton from "./PressAbleButton";
 
-export default function IncrementDecrement({ max, min }) {
+export default function IncrementDecrement({
+    max,
+    min,
+    buttonStyle,
+    incrementBtnStyle,
+    decrementBtnStyle,
+    onChange,
+    incrementBtnTextStyle,
+    decrementBtnTextStyle,
+    counterContainerStyle,
+    counterTextStyle,
+    containerStyle,
+    inacitveIncrimentStyle,
+    inacitveDecrementStyle,
+}) {
+    const getValue = (v) => {
+        return v;
+    };
+
     const [count, setCount] = useState(1);
     const increment = () => {
-        if (count < +max) setCount((c) => c + 1);
+        if (count < +max) {
+            let newCount = count + 1;
+            setCount(newCount);
+            onChange(newCount);
+        }
     };
     const decrement = () => {
-        if (count > +min) setCount((c) => c - 1);
+        if (count > +min) {
+            let newCount = count - 1;
+            setCount(newCount);
+            onChange(newCount);
+        }
     };
+
+    const btnStyle = buttonStyle ? buttonStyle : styles.btn;
+    const incrBtnStyle = incrementBtnStyle
+        ? {...incrementBtnStyle,...styles.incrementBtn}
+        : styles.incrementBtn;
+    const decrBtnStyle = decrementBtnStyle
+        ? {...decrementBtnStyle,...styles.decrementBtn}
+        : styles.decrementBtn;
+    const incrBtnTextStyle = incrementBtnTextStyle
+        ? {...incrementBtnTextStyle,...styles.incrementBtnTextStyle}
+        : styles.incrementBtnTextStyle;
+    const decrBtnTextStyle = decrementBtnTextStyle
+        ? {...decrementBtnTextStyle,...styles.decrementBtnTextStyle}
+        : styles.decrementBtnTextStyle;
+    const ctrContainerStyle = counterContainerStyle
+        ? {...counterContainerStyle,...styles.counterContainerStyle}
+        : styles.counterContainer;
+    const ctrTextStyle = counterTextStyle
+        ? {...counterTextStyle,...styles.counterTextStyle}
+        : styles.counterTextStyle;
+    const contStyle = containerStyle
+        ? { ...containerStyle, ...styles.container }
+        : styles.container;
+    const incr = { ...btnStyle, ...incrBtnStyle };
+    const decr = { ...btnStyle, ...decrBtnStyle };
+
     return (
-        <View style={styles.container}>
-             <PressAbleButton
+        <View style={contStyle}>
+            <PressAbleButton
                 onPress={decrement}
-                buttonStyle={{...styles.btn,...styles.decrementBtn}}
+                buttonStyle={incr}
                 title="-"
-                titleStyle={styles.titleStyle}
+                titleStyle={incrBtnTextStyle}
             />
-            <View style={styles.countContainer}>
-                <Text style={styles.counter}>{count}</Text>
+            <View style={ctrContainerStyle}>
+                <Text style={ctrTextStyle}>{count}</Text>
             </View>
             <PressAbleButton
                 onPress={increment}
-                buttonStyle={{...styles.btn,...styles.incrementBtn}}
+                buttonStyle={decr}
                 title="+"
-                titleStyle={styles.titleStyle}
+                titleStyle={decrBtnTextStyle}
             />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    btn:{
-        width: '40%',
+    btn: {
+        width: "37.5%",
         backgroundColor: "#00a680",
-        height:'100%',
+        height: "100%",
         alignItems: "center",
         textAlign: "center",
         flexDirection: "row",
         justifyContent: "center",
     },
-    incrementBtn: {
-        backgroundColor: "#E39508",
-        borderTopRightRadius:10,
-        borderBottomRightRadius:10,
-    },
     decrementBtn: {
+        backgroundColor: "#E39508",
+        borderTopRightRadius: 10,
+        borderBottomRightRadius: 10,
+    },
+    incrementBtn: {
         backgroundColor: "#FF1C73",
-        borderTopLeftRadius:10,
-        borderBottomLeftRadius:10,
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 10,
     },
-    countContainer: {
-        width: '20%',
-        backgroundColor: "#FFA9C1",
-        padding: 10,
-        alignItems: 'center',
-        height: '100%',
+    counterContainer: {
+        width: "25%",
+        backgroundColor: "#FFA9D0",
+        padding: 5,
+        alignItems: "center",
+        textAlignVertical: "center",
+        height: "100%",
     },
-    counter: {
-       color: "white",
-         fontSize: 20,
-         fontWeight: "bold",
+    counterTextStyle: {
+        color: "black",
+        fontSize: 20,
+        fontWeight: "bold",
     },
     container: {
         flexDirection: "row",
         alignItems: "center",
     },
-    titleStyle:{
+    incrementBtnTextStyle: {
         fontSize: 30,
         color: "#fff",
         fontWeight: "bold",
-    }
+    },
+    decrementBtnTextStyle: {
+        fontSize: 30,
+        color: "#fff",
+        fontWeight: "bold",
+    },
 });

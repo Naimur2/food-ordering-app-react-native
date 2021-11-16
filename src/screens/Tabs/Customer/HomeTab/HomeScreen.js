@@ -1,88 +1,88 @@
-import React, { useEffect } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import React, { useEffect, useContext, useState } from "react";
+import { ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import PressAbleButton from "../components/PressAbleButton";
 import DataContext from "../../../../contexts/data-context";
-import FlatListMaker from "./FlatListMaker";
-import { Divider } from 'react-native-elements';
-
-
+import CustomerContext from "../../../../contexts/customer-context";
+import FoodListMaker from "./FoodDetails/FoodListMaker";
 
 export default function HomeScreen({ navigation }) {
-    const [selectedCategory, setSelectedCategory] = React.useState('All');
-    const dataCtx = React.useContext(DataContext);
-    const [data, setData] = React.useState({foods:[],categories:[]});
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const dataCtx = useContext(DataContext);
     const isLoggedIn = dataCtx.isLoggedIn;
+    const user = dataCtx.user;
+    const cusCtx = useContext(CustomerContext);
 
-    const FetchData = async (url) => {
-      try{
-        const response = await fetch(url);
-        const newdata = await response.json();
-        setData(newdata.result);
-     
-        console.log(newdata);
-      }
-      catch (err) {
-          console.log(err);
-      }
-    }
-
-    useEffect(()=>{
-        let clean=true; 
-        console.log("HomeScreen useEffect");
-        FetchData("http://192.168.0.105:5000/foods/all");
-        return ()=>{
-            clean=false;
-            setData({foods:[],categories:[]});
+    useEffect(() => {
+        let clean = true;
+        if (isLoggedIn && clean && user.role==="customer") {
+            cusCtx.addData();
         }
-    },[isLoggedIn])
+        return () => {
+            clean = false;
+        };
+    }, [isLoggedIn,user]);
 
     const categoryChangeHandler = (item) => {
-        if(item._id){
+        if (item._id) {
             setSelectedCategory(item._id);
-        }
-        else{
+        } else {
             setSelectedCategory(item.key);
         }
-    }
+    };
 
-
-const RenderCatagory = () =>{
-       const All ={name:"All",key:"All"};
-       const newCat = [All,...data.categories];
-       return newCat.map((c,id) => (
-            <PressAbleButton 
+    const RenderCatagory = () => {
+        const All = { name: "All", key: "All" };
+        const newCat = [All, ...cusCtx.category];
+        return newCat.map((c, id) => (
+            <PressAbleButton
                 key={c._id || c.key}
-                buttonStyle={c._id === selectedCategory || c.key === selectedCategory ?  {...styles.btnStyle, backgroundColor: "#D3103E",
-                color: "white",} : styles.btnStyle}
+                buttonStyle={
+                    c._id === selectedCategory || c.key === selectedCategory
+                        ? {
+                              ...styles.btnStyle,
+                              backgroundColor: "#D3103E",
+                              color: "white",
+                          }
+                        : styles.btnStyle
+                }
                 title={c.name}
-                onPress={()=>categoryChangeHandler(c)}
+                onPress={() => categoryChangeHandler(c)}
             />
         ));
-    }
+    };
 
-    const getData = (dataArray,cat)=>{
+    const getData = (dataArray, cat) => {
         let cataArray = [];
-        if(selectedCategory === "All"){
+        if (selectedCategory === "All") {
             cataArray = cat;
-        }
-        else{
-            cataArray = cat.filter(c => c._id === selectedCategory);
+        } else {
+            cataArray = cat.filter((c) => c._id === selectedCategory);
         }
         return cataArray.map((c) => {
             const newData = dataArray.filter((f) => f.category === c._id);
             return {
                 title: c.name,
-                data:newData
-            };  
-        }
-        );
-    
-    }
+                data: newData,
+            };
+        });
+    };
 
-const DATA= getData(data.foods,data.categories);
+   
+    const DATA = getData(cusCtx.items, cusCtx.category);
 
     return (
         <>
+            {cusCtx.isLoading && (
+                <ActivityIndicator
+                    style={{
+                        position: "absolute",
+                        top: "40%",
+                        left: "45%",
+                    }}
+                    size="large"
+                    color="red"
+                />
+            )}
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
@@ -91,7 +91,7 @@ const DATA= getData(data.foods,data.categories);
             >
                 <RenderCatagory />
             </ScrollView>
-            <FlatListMaker data={DATA} navigation={navigation} />
+            <FoodListMaker data={DATA} navigation={navigation} />
         </>
     );
 }
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-around",
         height: 70,
-        alignItems: 'center',
+        alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -143,5 +143,4 @@ const styles = StyleSheet.create({
     activeText: {
         color: "#fff",
     },
-   
 });

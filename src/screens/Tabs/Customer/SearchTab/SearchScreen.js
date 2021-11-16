@@ -1,12 +1,12 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-export default function Test({navigation}) {
+export default function SearchScreen() {
    const {container} = styles;
 
 return (
    <View style={container}>
-       <Text onPress={()=> navigation.navigate('Food')}>Test</Text>
+       <Text>SearchScreen</Text>
    </View>
 );
 }

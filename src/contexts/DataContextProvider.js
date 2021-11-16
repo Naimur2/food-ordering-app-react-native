@@ -1,58 +1,70 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import DataContext from "./data-context";
-import { AsyncStorage } from 'react-native';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const defaultState = {
     data: [],
     category: [],
-    isLoggedIn: true,
-    isLoading: false,
+    isLoggedIn: false,
     error: null,
+    isLoading: false,
+    user: {},
 };
 
 const dataReducer = (state, action) => {
-    switch (action.type) {
-        case "FETCH_DATA":
-            return {
-                ...state,
-                isLoading: true,
-                error: null,
-            };
-        case "FETCH_DATA_SUCCESS":
-            return {
-                ...state,
-                isLoading: false,
-                data: action.payload,
-            };
-        case "FETCH_DATA_FAILURE":
-            return {
-                ...state,
-                isLoading: false,
-                error: action.payload,
-            };
-        default:
-            return state;
+    if (action.type === "LOGIN") {
+        return {
+            ...state,
+            user: action.payload,
+            isLoading: false,
+            isLoggedIn: true,
+        };
+    }
+    if (action.type === "LOGOUT") {
+        return {
+            ...state,
+            user: {},
+            isLoading: false,
+            isLoggedIn: false,
+        };
+    }
+    return state;
+};
+
+export default function DataContextProvider({ children }) {
+    const [dataState, dispatchData] = useReducer(dataReducer, defaultState);
+
+    const setDataHandler = async (info) => {
+        try {
+            await AsyncStorage.setItem("@acc_token", info.access_token);
+            dispatchData({ type: "LOGIN", payload: info.user });
+     
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+const logOutHandler = async () => {
+    try {
+        await AsyncStorage.removeItem("@acc_token");
+        dispatchData({ type: "LOGOUT" });
+    } catch (e) {
+        console.log(e);
     }
 };
 
 
-export default function DataContextProvider({ children }) {
-    const [dataState, dispatchData] = useReducer(dataReducer, defaultState);
-    
-    const [data, setData] = React.useState([]);
-    const [loading, setLoading] = React.useState(false);
-    const [error, setError] = React.useState(null);
-
     const state = {
-        data: data,
-        category: "",
-        isLoading: loading,
-        isLoggedIn: defaultState.isLoggedIn,
-        error: error,
-        getData: () => {},
-        deleteData: () => {},
+        data: dataState.data,
+        category: dataState.category,
+        isLoading: dataState.isLoading,
+        isLoggedIn: dataState.isLoggedIn,
+        error: dataState.error,
+        setData: setDataHandler,
+        user: dataState.user,
+        onLogOut: logOutHandler,
     };
+
     return (
         <DataContext.Provider value={state}>{children}</DataContext.Provider>
     );

@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import FoodCard from "./FoodCard/FoodCard";
+import FoodCard from "../FoodCard/FoodCard";
 
 const List = ({ foods, navigation }) => {
     return (
@@ -21,7 +21,7 @@ const List = ({ foods, navigation }) => {
     );
 };
 
-const FlatListMaker = ({ data, navigation }) => {
+const FoodtListMaker = ({ data, navigation }) => {
     return (
         <ScrollView
             showsVerticalScrollIndicator={false}
@@ -59,4 +59,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default FlatListMaker;
+export default FoodtListMaker;
