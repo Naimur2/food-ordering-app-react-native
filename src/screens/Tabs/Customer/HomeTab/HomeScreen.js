@@ -1,26 +1,13 @@
 import React, { useEffect, useContext, useState } from "react";
 import { ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import PressAbleButton from "../components/PressAbleButton";
-import DataContext from "../../../../contexts/data-context";
+
 import CustomerContext from "../../../../contexts/customer-context";
 import FoodListMaker from "./FoodDetails/FoodListMaker";
 
 export default function HomeScreen({ navigation }) {
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const dataCtx = useContext(DataContext);
-    const isLoggedIn = dataCtx.isLoggedIn;
-    const user = dataCtx.user;
     const cusCtx = useContext(CustomerContext);
-
-    useEffect(() => {
-        let clean = true;
-        if (isLoggedIn && clean && user.role==="customer") {
-            cusCtx.addData();
-        }
-        return () => {
-            clean = false;
-        };
-    }, [isLoggedIn,user]);
 
     const categoryChangeHandler = (item) => {
         if (item._id) {

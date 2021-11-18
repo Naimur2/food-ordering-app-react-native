@@ -1,22 +1,25 @@
 import { Formik } from "formik";
 import React, { useState } from "react";
 import {
-    ActivityIndicator, Alert, KeyboardAvoidingView,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
     Platform,
     ScrollView,
     StyleSheet,
     Text,
-    View
+    View,
 } from "react-native";
 import { Button, Icon, Input } from "react-native-elements";
 import * as yup from "yup";
 import DataContext from "../../contexts/data-context";
+import CustomerContext from "../../contexts/customer-context";
 
 export default function LoginScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showPassword, setShowPassword] = useState(true);
-   
+    const customerContext = React.useContext(CustomerContext);
 
     const showAlert = () =>
         Alert.alert(
@@ -25,7 +28,7 @@ export default function LoginScreen({ navigation }) {
             [
                 {
                     text: "OK",
-                    onPress: () => setError(null),  // or do something,
+                    onPress: () => setError(null), // or do something,
                     style: "cancel",
                 },
             ],
@@ -55,38 +58,37 @@ export default function LoginScreen({ navigation }) {
                 }
             );
             const responseJson = await response.json();
-         
-            setIsLoading(false);
-            if (response.status === 401) {       
+
+            if (response.status === 401) {
                 setError(responseJson.error);
-            } else if((response.status === 200)) {
-                dataCtx.setData(responseJson);
+            } else if (response.status === 200) {
+                // send user data to customer Context
+                if (responseJson.user.role === "customer") {
+                    customerContext.logInHandler(responseJson);
+                }
             }
+
+            setIsLoading(false);
         } catch (err) {
-            console.log("Error",err);
+            console.log(err);
             setIsLoading(false);
         }
     };
 
     const eyeVisiblity = showPassword ? "visibility-off" : "visibility";
-    
+
     const loginValidationSchema = yup.object().shape({
-        email: yup
-            .string()
-            .required("Email Address is Required"),
-        password: yup
-            .string()
-            .required("Password is required"),
+        email: yup.string().required("Email Address is Required"),
+        password: yup.string().required("Password is required"),
     });
-   
 
     return (
-        <KeyboardAvoidingView   
+        <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
             <>
-            {error && showAlert()}
+                {error && showAlert()}
                 {isLoading && (
                     <ActivityIndicator
                         style={{
@@ -100,7 +102,7 @@ export default function LoginScreen({ navigation }) {
                 )}
                 <Formik
                     style={styles.inner}
-                   validationSchema={loginValidationSchema}
+                    validationSchema={loginValidationSchema}
                     initialValues={{
                         email: "",
                         password: "",
@@ -115,7 +117,6 @@ export default function LoginScreen({ navigation }) {
                         errors,
                     }) => (
                         <ScrollView style={styles.inner}>
-                           
                             <Input
                                 style={styles.input}
                                 placeholder="Email"
@@ -161,18 +162,17 @@ export default function LoginScreen({ navigation }) {
                                     // rightIcon is a react-native-elements prop
                                 }
                             />
-                            
+
                             <View style={styles.buttonContainer}>
-                                <Button
-                                    onPress={handleSubmit}
-                                    title="Login"
-                                />
+                                <Button onPress={handleSubmit} title="Login" />
                             </View>
                             <View style={styles.signUpLinks}>
-                                <Text>Don't have any account?  </Text>
+                                <Text>Don't have any account? </Text>
                                 <Text
                                     style={styles.link}
-                                    onPress={() => navigation.navigate("Register")}
+                                    onPress={() =>
+                                        navigation.navigate("Register")
+                                    }
                                 >
                                     Register
                                 </Text>

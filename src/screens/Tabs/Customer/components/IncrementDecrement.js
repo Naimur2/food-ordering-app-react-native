@@ -1,60 +1,54 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View,Button, } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    View,
+    Button,
+    TouchableWithoutFeedback,
+} from "react-native";
 import PressAbleButton from "./PressAbleButton";
 
 export default function IncrementDecrement({
+    value,
     max,
     min,
     buttonStyle,
     incrementBtnStyle,
     decrementBtnStyle,
     onChange,
+    steps,
     incrementBtnTextStyle,
     decrementBtnTextStyle,
     counterContainerStyle,
     counterTextStyle,
     containerStyle,
-    inacitveIncrimentStyle,
-    inacitveDecrementStyle,
 }) {
-    const getValue = (v) => {
-        return v;
-    };
 
-    const [count, setCount] = useState(1);
     const increment = () => {
-        if (count < +max) {
-            let newCount = count + 1;
-            setCount(newCount);
-            onChange(newCount);
-        }
+            onChange("increment",steps,max,min);
     };
     const decrement = () => {
-        if (count > +min) {
-            let newCount = count - 1;
-            setCount(newCount);
-            onChange(newCount);
-        }
+        onChange("decrement",steps,max,min);
     };
 
     const btnStyle = buttonStyle ? buttonStyle : styles.btn;
     const incrBtnStyle = incrementBtnStyle
-        ? {...incrementBtnStyle,...styles.incrementBtn}
+        ? { ...incrementBtnStyle, ...styles.incrementBtn }
         : styles.incrementBtn;
     const decrBtnStyle = decrementBtnStyle
-        ? {...decrementBtnStyle,...styles.decrementBtn}
+        ? { ...decrementBtnStyle, ...styles.decrementBtn }
         : styles.decrementBtn;
     const incrBtnTextStyle = incrementBtnTextStyle
-        ? {...incrementBtnTextStyle,...styles.incrementBtnTextStyle}
+        ? { ...incrementBtnTextStyle, ...styles.incrementBtnTextStyle }
         : styles.incrementBtnTextStyle;
     const decrBtnTextStyle = decrementBtnTextStyle
-        ? {...decrementBtnTextStyle,...styles.decrementBtnTextStyle}
+        ? { ...decrementBtnTextStyle, ...styles.decrementBtnTextStyle }
         : styles.decrementBtnTextStyle;
     const ctrContainerStyle = counterContainerStyle
-        ? {...counterContainerStyle,...styles.counterContainerStyle}
+        ? { ...counterContainerStyle, ...styles.counterContainerStyle }
         : styles.counterContainer;
     const ctrTextStyle = counterTextStyle
-        ? {...counterTextStyle,...styles.counterTextStyle}
+        ? { ...counterTextStyle, ...styles.counterTextStyle }
         : styles.counterTextStyle;
     const contStyle = containerStyle
         ? { ...containerStyle, ...styles.container }
@@ -70,9 +64,13 @@ export default function IncrementDecrement({
                 title="-"
                 titleStyle={incrBtnTextStyle}
             />
-            <View style={ctrContainerStyle}>
-                <Text style={ctrTextStyle}>{count}</Text>
-            </View>
+            <TouchableWithoutFeedback  onPress={increment} style={styles.counterContainer}>
+                <View
+                    style={styles.counterContainer}
+                >
+                    <Text style={ctrTextStyle}>{value}</Text>
+                </View>
+            </TouchableWithoutFeedback>
             <PressAbleButton
                 onPress={increment}
                 buttonStyle={decr}
@@ -102,14 +100,15 @@ const styles = StyleSheet.create({
         backgroundColor: "#FF1C73",
         borderTopLeftRadius: 10,
         borderBottomLeftRadius: 10,
+        width: "37.5%",
     },
     counterContainer: {
-        width: "25%",
         backgroundColor: "#FFA9D0",
         padding: 5,
         alignItems: "center",
         textAlignVertical: "center",
         height: "100%",
+        width: 100,
     },
     counterTextStyle: {
         color: "black",
@@ -119,6 +118,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
     },
     incrementBtnTextStyle: {
         fontSize: 30,

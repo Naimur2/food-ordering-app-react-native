@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import RenderImage from "../../../../../common/RenderImage";
 import IncrementDecrement from "../../components/IncrementDecrement";
@@ -7,18 +7,45 @@ import Description from "./Description";
 import Header from "./Header";
 import Offers from "./Offers";
 import CustomerContext from "../../../../../contexts/customer-context";
-import DataContext from "../../../../../contexts/data-context";
 
 export default function FoodDetails({ route, navigation }) {
-    const customerCtx = React.useContext(CustomerContext);
     const params = route.params;
     const image = `uploads/${params.images[0]}`;
-    const dataCtx = useContext(DataContext);
-    const userPro = dataCtx.user;
-
+    const customerContext = useContext(CustomerContext);
     const [counter, setCounter] = useState(1);
+    const cart = customerContext.cart;
 
+    useEffect(() => {
+        const getValue = () => {
+            const product = cart.filter((i) => i.productId === params._id);
+            if (product && product.length > 0) {
+                setCounter(product[0].quantity);
+            }
+        };
+        getValue();
+    }, [customerContext.cart]);
 
+    const onChangeHandler = (type, steps, max, min) => {
+        let newCount = counter;
+        if (type === "increment") {
+            if (counter < +max) {
+                 newCount = counter + +steps;
+               
+            }
+        }
+        if (type === "decrement") {
+            if (counter > +min) {
+                 newCount = counter - +steps;
+            }
+        }
+
+        const product = cart.filter((i) => i.productId === params._id);
+            if (product && product.length > 0) {
+                customerContext.updateItem(product[0].productId, newCount);
+            }
+
+        setCounter(newCount);
+    };
 
     const item = {
         productId: params._id,
@@ -46,15 +73,14 @@ export default function FoodDetails({ route, navigation }) {
             >
                 <IncrementDecrement
                     containerStyle={{ width: 300 }}
-                    onChange={setCounter}
+                    onChange={onChangeHandler}
                     min={params.min || "1"}
                     max={params.max || "5"}
+                    steps={params.steps || "1"}
+                    value={counter}
                 />
             </View>
-            <AddToCartButton
-                onPress={() => customerCtx.addToCart(item)}
-                style={styles}
-            />
+            <AddToCartButton item={item} style={styles} />
         </View>
     );
 }

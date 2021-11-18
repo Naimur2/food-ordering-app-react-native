@@ -3,8 +3,6 @@ import DataContext from "./data-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const defaultState = {
-    data: [],
-    category: [],
     isLoggedIn: false,
     error: null,
     isLoading: false,
@@ -34,11 +32,9 @@ const dataReducer = (state, action) => {
 export default function DataContextProvider({ children }) {
     const [dataState, dispatchData] = useReducer(dataReducer, defaultState);
 
-    const setDataHandler = async (info) => {
+    const logInHandler = async (user) => {
         try {
-            await AsyncStorage.setItem("@acc_token", info.access_token);
-            dispatchData({ type: "LOGIN", payload: info.user });
-     
+            dispatchData({ type: "LOGIN", payload: user });
         } catch (e) {
             console.log(e);
         }
@@ -47,7 +43,7 @@ export default function DataContextProvider({ children }) {
 const logOutHandler = async () => {
     try {
         await AsyncStorage.removeItem("@acc_token");
-        dispatchData({ type: "LOGOUT" });
+        await dispatchData({ type: "LOGOUT" });
     } catch (e) {
         console.log(e);
     }
@@ -55,12 +51,10 @@ const logOutHandler = async () => {
 
 
     const state = {
-        data: dataState.data,
-        category: dataState.category,
         isLoading: dataState.isLoading,
         isLoggedIn: dataState.isLoggedIn,
         error: dataState.error,
-        setData: setDataHandler,
+        onLogIn: logInHandler,
         user: dataState.user,
         onLogOut: logOutHandler,
     };

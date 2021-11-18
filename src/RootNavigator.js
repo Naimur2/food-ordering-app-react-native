@@ -28,7 +28,7 @@ export default function RootNavigator() {
                     );
                     const { result } = await response.json();
                     const data = await { access_token: key, user: result };
-                    await dataCtx.setData(data);
+                    await dataCtx.onLogIn(data);
                     setIsLoading(false);
                 }
                 if (!key) {

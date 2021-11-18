@@ -1,11 +1,12 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import * as React from "react";
+import  React,{useContext,useEffect} from "react";
 import { Icon } from "react-native-elements";
 import HomeStackScreen from "./HomeTab/HomeStackScreen";
 import SettingsStackScreen from "./SettingsTab/SettingsStactScreen";
 import CartStackScreen from "./CartTab/CartStackScreen";
 import SearchStackScreen from "./SearchTab/SearchStackScreen";
-
+import DataContext from "../../../contexts/data-context";
+import CustomerContext from "../../../contexts/customer-context";
 
 const RenderIcon = ({ name, color }) => (
     <Icon name={name} type="ionicon" color="#517fa4" />
@@ -14,6 +15,22 @@ const RenderIcon = ({ name, color }) => (
 const Tab = createBottomTabNavigator();
 
 export default function CustomerRoute() {
+    const dataCtx = useContext(DataContext);
+    const customerCtx = useContext(CustomerContext);
+    const isLoggedIn = dataCtx.isLoggedIn;
+    const user = dataCtx.user;
+    useEffect(() => {
+        let clean = true;
+        if (isLoggedIn && clean && user.role==="customer") {
+            customerCtx.addData();
+        }
+        return () => {
+            clean = false;
+        };
+    }, [isLoggedIn,user]);
+
+
+
     return (
             <Tab.Navigator
                 initialRouteName="Home"

@@ -8,8 +8,17 @@ const CustomerContext = React.createContext({
     isLoading: null,
     error: null,
     addToCart: null,
-    removeCart: null,
+    removeRomCart: null,
     addData: null,
+    totalCartAmount:null,
+    totalCartItems:null,
+    deliveryFee:null,
+    updateItem:null,
+    address:null,
+    updateAddress:()=>{},
+    orderHandler:()=>{},
+    logInHandler:()=>{},
+    logOutHandler:()=>{},
 });
 
 export default CustomerContext;
