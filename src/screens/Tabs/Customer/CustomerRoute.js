@@ -19,6 +19,7 @@ export default function CustomerRoute() {
     const customerCtx = useContext(CustomerContext);
     const isLoggedIn = dataCtx.isLoggedIn;
     const user = dataCtx.user;
+    
     useEffect(() => {
         let clean = true;
         if (isLoggedIn && clean && user.role==="customer") {

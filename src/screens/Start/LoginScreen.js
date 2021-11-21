@@ -14,12 +14,14 @@ import { Button, Icon, Input } from "react-native-elements";
 import * as yup from "yup";
 import DataContext from "../../contexts/data-context";
 import CustomerContext from "../../contexts/customer-context";
+import AdminContext from "../../contexts/admin-context";
 
 export default function LoginScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showPassword, setShowPassword] = useState(true);
     const customerContext = React.useContext(CustomerContext);
+    const adminCtx = React.useContext(AdminContext);
 
     const showAlert = () =>
         Alert.alert(
@@ -66,11 +68,14 @@ export default function LoginScreen({ navigation }) {
                 if (responseJson.user.role === "customer") {
                     customerContext.logInHandler(responseJson);
                 }
+                if (responseJson.user.role === "admin") {
+                    adminCtx.logInHandler(responseJson);
+                }
             }
 
             setIsLoading(false);
         } catch (err) {
-            console.log(err);
+            console.log("error here 13",err);
             setIsLoading(false);
         }
     };

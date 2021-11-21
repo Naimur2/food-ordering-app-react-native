@@ -38,8 +38,8 @@ export default function AddNewAddress({ navigation }) {
 const customerCtx= useContext(CustomerContext);
     const formHandler = async (values) => {
         const address = { ...values,city:"dhaka" };
-        await customerCtx.updateAddress(values,"add");
-        await navigation.navigate("Order",values)
+        await customerCtx.updateAddress(address,"add");
+        await navigation.goBack();
     };
 
 
@@ -148,6 +148,7 @@ const customerCtx= useContext(CustomerContext);
                             {inputItems.map((item, index) => (
                                 <Input
                                     key={index}
+                                    key={index}
                                     style={styles.input}
                                     placeholder={item.placeholder}
                                     onChangeText={handleChange(item.name)}
@@ -172,7 +173,10 @@ const customerCtx= useContext(CustomerContext);
                             ))}
 
                             <View style={styles.buttonContainer}>
-                                <Button onPress={handleSubmit} title="Next" />
+                                <Button onPress={handleSubmit} title="Add New Address" />
+                            </View>
+                            <View style={styles.buttonContainer}>
+                                <Button buttonStyle={{backgroundColor:'red'}} onPress={()=> navigation.goBack() } title="Cancel" />
                             </View>
                         </ScrollView>
                     )}

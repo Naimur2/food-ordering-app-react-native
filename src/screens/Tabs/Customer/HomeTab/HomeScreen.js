@@ -57,6 +57,8 @@ export default function HomeScreen({ navigation }) {
    
     const DATA = getData(cusCtx.items, cusCtx.category);
 
+    
+
     return (
         <>
             {cusCtx.isLoading && (

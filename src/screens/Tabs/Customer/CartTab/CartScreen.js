@@ -7,6 +7,15 @@ import TotalContainer from "./TotalContainer";
 export default function CartScreen({ navigation }) {
     const customerCtx = useContext(CustomerContext);
 
+    const checkOutHandler = () => { 
+    if(customerCtx.address.length<=0){
+        navigation.navigate("AddAddress")
+    }
+    else{
+        navigation.navigate("SelectAddress")
+    }
+    };
+
     return (
         <>
             {customerCtx.cart.length > 0 ? (
@@ -16,7 +25,7 @@ export default function CartScreen({ navigation }) {
                             <Item key={item._id} item={item} />
                         ))}
                     </ScrollView>
-                    <TotalContainer onCheckout={()=>navigation.navigate("AddAddress")} total={customerCtx.totalCartAmount} />
+                    <TotalContainer onCheckout={checkOutHandler} total={customerCtx.totalCartAmount} />
                 </View>
             ) : (
                 <View style={styles.emptyCart}>

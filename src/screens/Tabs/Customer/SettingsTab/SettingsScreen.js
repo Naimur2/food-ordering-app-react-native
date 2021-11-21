@@ -28,22 +28,17 @@ export default function HomeScreen({ navigation }) {
         {
             title: "My Account",
             icon: "person",
-            onPress: () => Alert.alert("My Account"),
+            onPress: () => navigation.navigate("MyAccount"),
         },
         {
             title: "Track Order",
             icon: "bicycle",
-            onPress: () => Alert.alert("Track"),
-        },
-        {
-            title: "Order History",
-            icon: "timer",
-            onPress: () => Alert.alert("History"),
+            onPress:()=> navigation.navigate("Orders"),
         },
         {
             title: "Address Book",
             icon: "book",
-            onPress: () => Alert.alert("Address"),
+            onPress: () =>  navigation.navigate("AddressTab")
         },
         {
             title: "Logout",

@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const defaultState = {
     isLoggedIn: false,
     error: null,
-    isLoading: false,
+    isLoading: true,
     user: {},
 };
 
@@ -26,6 +26,13 @@ const dataReducer = (state, action) => {
             isLoggedIn: false,
         };
     }
+    if (action.type === "SET_LOADING") {
+        return {
+            ...state,
+            isLoading: action.payload,
+
+        };
+    }
     return state;
 };
 
@@ -35,8 +42,8 @@ export default function DataContextProvider({ children }) {
     const logInHandler = async (user) => {
         try {
             dispatchData({ type: "LOGIN", payload: user });
-        } catch (e) {
-            console.log(e);
+        } catch (err) {
+            console.log("error here 11",err);
         }
     };
 
@@ -44,8 +51,8 @@ const logOutHandler = async () => {
     try {
         await AsyncStorage.removeItem("@acc_token");
         await dispatchData({ type: "LOGOUT" });
-    } catch (e) {
-        console.log(e);
+    } catch (err) {
+        console.log("error here 12",err);
     }
 };
 
@@ -57,6 +64,9 @@ const logOutHandler = async () => {
         onLogIn: logInHandler,
         user: dataState.user,
         onLogOut: logOutHandler,
+        setLoading: (isLoading) => {    
+            dispatchData({ type: "SET_LOADING", payload: isLoading });
+        }
     };
 
     return (

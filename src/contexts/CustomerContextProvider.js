@@ -45,6 +45,7 @@ const dataReducer = (state, action) => {
             cart: action.payload.cart,
             address: action.payload.address,
             orders: action.payload.orders,
+            totalCartAmount: action.payload.totalAmount,
         };
     }
 
@@ -55,6 +56,7 @@ const dataReducer = (state, action) => {
             cart: action.payload.cart,
             address: action.payload.address,
             orders: action.payload.orders,
+            totalCartAmount: action.payload.totalAmount,
         };
     }
 
@@ -66,6 +68,7 @@ const dataReducer = (state, action) => {
             cart: [],
             address: [],
             orders: [],
+            totalCartAmount: 0,
         };
     }
 
@@ -120,7 +123,7 @@ export default function DataContextProvider({ children }) {
                 payload: { item: result, totalAmount: amount + value },
             });
         } catch (err) {
-            console.log(err);
+            console.log("error here 4",err);
         }
     };
 
@@ -156,7 +159,7 @@ export default function DataContextProvider({ children }) {
                 payload: { newCart, totalAmount: amount },
             });
         } catch (err) {
-            console.log(err);
+            console.log("error here 5",err);
         }
     };
 
@@ -194,7 +197,7 @@ export default function DataContextProvider({ children }) {
                 payload: { newCart, totalAmount: amount },
             });
         } catch (err) {
-            console.log(err);
+            console.log("error here 6",err);
         }
     };
 
@@ -206,7 +209,7 @@ export default function DataContextProvider({ children }) {
             // fetch food data
             const response = await fetch("http://192.168.0.105:5000/foods/all");
             const newdata = await response.json();
-            const foodData = newdata.result;
+            const foodData =await newdata.result;
 
           // fetching cart data,address data ,orders data
           const result = await fetch("http://192.168.0.105:5000/user/data", {
@@ -219,7 +222,10 @@ export default function DataContextProvider({ children }) {
         });
 
         const allData = await result.json();
-        const finalResult = allData.result;
+        const finalResult =await allData.result;
+        const totalCartAmount =await finalResult.cart.reduce((acc, curr) => {
+            return acc + curr.price * curr.quantity;
+        }, 0);
 
             await dispatchData({
                 type: "SET_DATA",
@@ -228,10 +234,11 @@ export default function DataContextProvider({ children }) {
                     cart: finalResult.cart,
                     address: finalResult.address,
                     orders: finalResult.orders,
+                    totalAmount: totalCartAmount,
                 },
             });
         } catch (err) {
-            console.log(err);
+            console.log("error here1",err);
         }
     };
 
@@ -254,14 +261,17 @@ export default function DataContextProvider({ children }) {
                 );
 
                 const data = await response.json();
-                const payload = [data.result, ...dataState.address];
+                const { result } = data;
+                console.log(result);
+                const payload =await [data.result, ...dataState.address];
                 await dispatchData({ type: "ADD_ADDRESS", payload });
             }
         } catch (err) {
-            console.log(err);
+            console.log("error here 7",err);
         }
     };
     const orderHandler = async (details, type) => {
+        const detailsData = { ...details,createdAt:new Date() };
         const { user } = dataContext;
         const key = await AsyncStorage.getItem("@acc_token");
         try {
@@ -285,32 +295,32 @@ export default function DataContextProvider({ children }) {
                         Authorization: `Bearer ${key}`,
                     },
 
-                    body: JSON.stringify(details),
+                    body: JSON.stringify(detailsData),
                 });
 
                 const data = await response.json();
-                const payload = data.result;
+                const payload =await data.result;
                 await dispatchData({ type: "ADD_ORDER", payload });
             }
         } catch (err) {
-            console.log(err);
+            console.log("error here8",err);
         }
     };
 
     const logOut = async () => {
         try {
-           
             // remove user data
             await dataContext.onLogOut();
             // remove data,cart dataaddress data, orders data
             await dispatchData({ type: "REMOVE_DATA" });
         } catch (err) {
-            console.log(err);
+            console.log("error here 9",err);
         }
     };
 
     const logIn = async (data) => {
         try {
+            
             // check  if access token ccessexists
             const key = await AsyncStorage.getItem("@acc_token");
             if (key) {
@@ -319,37 +329,45 @@ export default function DataContextProvider({ children }) {
             }
             // get user id
             const {_id:userId} = data.user;
+            
 
             // add access token
             await AsyncStorage.setItem("@acc_token", data.access_token);
-            // add user data
-            await dataContext.onLogIn(data.user);
             // remove data,cart dataaddress data, orders data
             await dispatchData({ type: "REMOVE_DATA" });
+            
+                 // fetching cart data,address data ,orders data
+                 const result = await fetch("http://192.168.0.105:5000/user/data", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${key}`,
+                    },
+                    body: JSON.stringify({ user: userId}),
+                });
+        
+                const allData = await result.json();
+                const finalResult =await allData.result;
 
-             // fetching cart data,address data ,orders data
-             const result = await fetch("http://192.168.0.105:5000/user/data", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${key}`,
-                },
-                body: JSON.stringify({ user: userId }),
-            });
-
-            const newData = await result.json();
-            const finalResult = newData.result;
-
+            const totalCartAmount =await finalResult.cart.reduce((acc, curr) => {
+                return acc + curr.price * curr.quantity;
+            }, 0);
+            // update state
             await dispatchData({
                 type: "LOGGED_IN",
                 payload: {
                     orders: finalResult.orders,
                     address: finalResult.address,
                     cart: finalResult.cart,
+                    totalAmount: totalCartAmount,
                 },
             });
+
+            // add user data
+            await dataContext.onLogIn(data.user);
+            
         } catch (err) {
-            console.log(err);
+            console.log("error here 10",err);
         }
     };
 

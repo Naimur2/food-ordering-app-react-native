@@ -1,53 +1,59 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useContext, useState, useEffect } from "react";
+import { StyleSheet, Text, View, ScrollView, Alert } from "react-native";
 import { ListItem, Icon, Image, Button } from "react-native-elements";
+import AdminContext from "../../../../contexts/admin-context";
 import CustomerContext from "../../../../contexts/customer-context";
-import DataContext from "../../../../contexts/data-context";
+import AcceptRejectButton from "./AcceptRejectButton";
 
-const list = [
-    {
-        title: "Appointments",
-        icon: "av-timer",
-    },
-    {
-        title: "Trips",
-        icon: "flight-takeoff",
-    },
-];
+export default function OrderDetails({ navigation, route }) {
+    const adminCtx = useContext(AdminContext);
+    const customerCtx = useContext(CustomerContext);
 
-export default function OrderTab({ navigation, route }) {
-    const { cart, items, deliveryFee } = React.useContext(CustomerContext);
-    const { user } = React.useContext(DataContext);
-    const customerCtx = React.useContext(CustomerContext);
+    // get all information from route
+    const { order, output, deliveryFee, role } = route.params;
 
-    const totalCount = cart.reduce((curr, item) => {
-        return curr + item.quantity * item.price;
-    }, 0);
+    // get required information from order
+    const {
+        address,
+        totalPrice: subTotal,
+        deliveryStatus,
+        cartdetails,
+    } = order;
 
-    const output = cart.map((cc) => {
-        let com = items.filter((i) => cc.productId === i._id);
-        return { cartContent: cc, product: com[0] };
-    });
-    const subTotal = totalCount + +deliveryFee;
-    const { address } = route.params;
+    const [orderStatus, setOrderStatus] = useState(deliveryStatus);
 
-    const orderHandler = async () => {
-        const orderDetails = {
-            address,
-            cartdetails: cart,
-            user: user._id,
-            deliveryStatus: "pending",
-            paymentStatus: "pending",
-            totalPrice: subTotal,
-            deliveryFee: deliveryFee,
-        };
-        await customerCtx.orderHandler(orderDetails, "add");
-        await navigation.navigate("CartScreen");
-    };
+    useEffect(() => {
+        const orderId = order._id;
+        let filtered;
+        if (role === "customer") {
+            filtered = customerCtx.orders.filter((ord) => ord._id === orderId);
+            setOrderStatus(filtered[0].deliveryStatus);
+        }
+        if (role === "admin") {
+            filtered=adminCtx.orders.filter((ord) => ord._id === orderId);
+            setOrderStatus(filtered[0].deliveryStatus);
+        }
+    }, [customerCtx, adminCtx]);
+
+    // get information from addres
+    const {
+        name: customername,
+        phone,
+        addressline1: address1,
+        addressline2: address2,
+    } = address;
+
+    const city = "Dhaka";
+    const fulladdress = `${address1}, ${address2}, ${city}`;
+
+    const date = new Date(order.createdAt);
+    const dateString = date.toDateString();
+    const timeString = date.toLocaleTimeString();
+    const dateTimeString = `${dateString} ${timeString}`;
 
     return (
-        <View>
-            <Text style={styles.confirm}>Confirm Your Order</Text>
+        <ScrollView>
+            <Text style={styles.confirm}>Order Details</Text>
             {output.map((item, i) => (
                 <ListItem key={item.cartContent._id} bottomDivider>
                     <Image
@@ -69,55 +75,62 @@ export default function OrderTab({ navigation, route }) {
                 </ListItem>
             ))}
 
-            <View  style={{marginTop:15}}>
-                <Text style={{fontWeight:'bold', fontSize:16, textAlign:'center'}}>Order Details</Text>
+            <View style={{ paddingVertical: 10 }}>
                 <View style={styles.customer}>
                     <Text style={styles.customerHeader}>Name: </Text>
-                    <Text style={styles.customerDetails}> {address.name}</Text>
+                    <Text style={styles.customerDetails}> {customername}</Text>
                 </View>
                 <View style={styles.customer}>
                     <Text style={styles.customerHeader}>Address: </Text>
-                    <Text style={styles.customerDetails}>
-                        {" "}
-                        {address.addressline1} ,{address.addressline2} ,{address.city}
-                    </Text>
+                    <Text style={styles.customerDetails}> {fulladdress}</Text>
                 </View>
                 <View style={styles.customer}>
                     <Text style={styles.customerHeader}>Phone: </Text>
-                    <Text style={styles.customerDetails}> {address.phone}</Text>
+                    <Text style={styles.customerDetails}> {phone}</Text>
+                </View>
+                <View style={styles.customer}>
+                    <Text style={styles.customerHeader}>Order Date: </Text>
+                    <Text style={styles.customerDetails}>
+                        {" "}
+                        {dateTimeString}
+                    </Text>
                 </View>
             </View>
-
             <View style={styles.totalContainer}>
                 <Text style={styles.total}>Total:</Text>
-                <Text style={styles.total}> {totalCount} Tk</Text>
+                <Text style={styles.total}> {subTotal} Tk</Text>
             </View>
             <View style={styles.deliveryFee}>
                 <Text style={styles.total}>D. Fee:</Text>
                 <Text style={styles.total}> {deliveryFee} Tk</Text>
             </View>
             <View style={styles.subTotal}>
-                <Text style={styles.total}>Subtotal</Text>
+                <Text style={styles.total}>Sub total</Text>
                 <Text style={styles.total}> {subTotal} Tk</Text>
             </View>
             <View style={styles.subTotal}>
                 <Text style={styles.total}>Payment: Cash On Delivery</Text>
             </View>
-            <Button
-                buttonStyle={styles.confirmBtn}
-                title="Confirm Order"
-                onPress={orderHandler}
-            />
-            <Button
-                buttonStyle={styles.cancelBtn}
-                title="Cancel Order"
-                onPress={() => navigation.navigate("CartScreen")}
-            />
-        </View>
+            <View style={styles.status}>
+                <Text style={styles.total}>Status: {orderStatus}</Text>
+            </View>
+            {role === "admin" && (
+                <AcceptRejectButton
+                    role={role}
+                    order={order}
+                    orderStatus={orderStatus}
+                />
+            )}
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    customer: {
+        flexDirection: "row",
+        paddingHorizontal: 10,
+        marginTop: 5,
+    },
     container: {
         flex: 1,
         alignItems: "center",
@@ -152,7 +165,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginHorizontal: 10,
-        marginTop: 20,
+        marginTop: 10,
     },
     deliveryFee: {
         flexDirection: "row",
@@ -169,16 +182,18 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginBottom: 10,
     },
+    status: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginHorizontal: 10,
+        marginBottom: 10,
+    },
     total: {
         fontSize: 16,
         fontWeight: "bold",
         marginVertical: 5,
         textAlign: "center",
-    },
-    customer: {
-        flexDirection: "row",
-        paddingHorizontal: 10,
-        marginTop: 5,
+        textTransform: "capitalize",
     },
     customerHeader: {
         fontSize: 16,
