@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View,ScrollView } from "react-native";
 import { ListItem, Icon, Image, Button } from "react-native-elements";
 import CustomerContext from "../../../../contexts/customer-context";
 import DataContext from "../../../../contexts/data-context";
@@ -46,7 +46,7 @@ export default function OrderTab({ navigation, route }) {
     };
 
     return (
-        <View>
+        <ScrollView>
             <Text style={styles.confirm}>Confirm Your Order</Text>
             {output.map((item, i) => (
                 <ListItem key={item.cartContent._id} bottomDivider>
@@ -113,7 +113,7 @@ export default function OrderTab({ navigation, route }) {
                 title="Cancel Order"
                 onPress={() => navigation.navigate("CartScreen")}
             />
-        </View>
+        </ScrollView>
     );
 }
 

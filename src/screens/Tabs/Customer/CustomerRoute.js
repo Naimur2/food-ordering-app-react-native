@@ -61,7 +61,7 @@ export default function CustomerRoute() {
                 })}
             >
                 <Tab.Screen name="Home" component={HomeStackScreen} />
-                <Tab.Screen name="Search" component={SearchStackScreen} />
+                {/* <Tab.Screen name="Search" component={SearchStackScreen} /> */}
                 <Tab.Screen name="Cart" component={CartStackScreen} />
                 <Tab.Screen name="Settings" component={SettingsStackScreen} />
             </Tab.Navigator>
