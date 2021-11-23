@@ -1,9 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View,Dimensions } from 'react-native';
 import DeliveryCharge from '../../components/DeliveryCharge';
-
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 
 export default function FoodCardInfo({propData}) {
+const {width,height} = Dimensions.get('window');
+
+
+
+
 return (
         <View style={styles.textContainer}>
             <Text style={styles.header}>{propData.title}</Text>
@@ -28,12 +33,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     header: {
-        fontSize: 20,
+        fontSize:RFPercentage(1.99),
         fontWeight: "bold",
         paddingBottom: 5,
+        
     },
     details: {
-        fontSize: 15,
+        fontSize: RFPercentage(1.8),
         color: "rgba(0,0,0,0.5)",
         paddingBottom: 5,
     },

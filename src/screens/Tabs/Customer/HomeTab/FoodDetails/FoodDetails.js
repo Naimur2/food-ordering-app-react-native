@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         borderRadius: 10,
+        resizeMode: "contain",
     },
     info: {
         width: "100%",

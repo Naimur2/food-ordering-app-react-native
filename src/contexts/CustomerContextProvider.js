@@ -15,6 +15,7 @@ const defaultState = {
     address: [],
 };
 
+// reducer function
 const dataReducer = (state, action) => {
     if (action.type === "ADD_TO_CART") {
         const { item, totalAmount: totalCartAmount } = action.payload;
@@ -60,7 +61,6 @@ const dataReducer = (state, action) => {
         };
     }
 
-
     if (action.type === "REMOVE_DATA") {
         return {
             ...state,
@@ -79,11 +79,28 @@ const dataReducer = (state, action) => {
             isLoading: false,
         };
     }
+
     if (action.type === "ADD_ORDER") {
         return {
             ...state,
             cart: [],
             orders: [...state.orders, action.payload],
+            isLoading: false,
+        };
+    }
+
+    if (action.type === "REMOVE_ADDRESS") {
+        return {
+            ...state,
+            address: action.payload,
+            isLoading: false,
+        };
+    }
+
+    if (action.type === "EDIT_ADDRESS") {
+        return {
+            ...state,
+            address: action.payload,
             isLoading: false,
         };
     }
@@ -95,7 +112,9 @@ export default function DataContextProvider({ children }) {
     const [dataState, dispatchData] = useReducer(dataReducer, defaultState);
     const dataContext = useContext(DataContext);
 
+    // add to cart
     const addToCartHandler = async (item) => {
+        
         try {
             const user = dataContext.user._id;
             const value = item.price * +item.quantity;
@@ -123,10 +142,11 @@ export default function DataContextProvider({ children }) {
                 payload: { item: result, totalAmount: amount + value },
             });
         } catch (err) {
-            console.log("error here 4",err);
+            console.log("error here 4", err);
         }
     };
 
+    // remove from cart
     const removeFromCartHandler = async (id) => {
         try {
             const { cart } = dataState;
@@ -159,10 +179,11 @@ export default function DataContextProvider({ children }) {
                 payload: { newCart, totalAmount: amount },
             });
         } catch (err) {
-            console.log("error here 5",err);
+            console.log("error here 5", err);
         }
     };
 
+    // update cart item
     const updateCartItem = async (id, quantity) => {
         try {
             const { cart } = dataState;
@@ -197,10 +218,11 @@ export default function DataContextProvider({ children }) {
                 payload: { newCart, totalAmount: amount },
             });
         } catch (err) {
-            console.log("error here 6",err);
+            console.log("error here 6", err);
         }
     };
 
+    // update food information on load
     const addFoodData = async () => {
         try {
             const { user } = dataContext;
@@ -209,23 +231,26 @@ export default function DataContextProvider({ children }) {
             // fetch food data
             const response = await fetch("http://192.168.0.105:5000/foods/all");
             const newdata = await response.json();
-            const foodData =await newdata.result;
+            const foodData = await newdata.result;
 
-          // fetching cart data,address data ,orders data
-          const result = await fetch("http://192.168.0.105:5000/user/data", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${key}`,
-            },
-            body: JSON.stringify({ user: user._id }),
-        });
+            // fetching cart data,address data ,orders data
+            const result = await fetch("http://192.168.0.105:5000/user/data", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${key}`,
+                },
+                body: JSON.stringify({ user: user._id }),
+            });
 
-        const allData = await result.json();
-        const finalResult =await allData.result;
-        const totalCartAmount =await finalResult.cart.reduce((acc, curr) => {
-            return acc + curr.price * curr.quantity;
-        }, 0);
+            const allData = await result.json();
+            const finalResult = await allData.result;
+            const totalCartAmount = await finalResult.cart.reduce(
+                (acc, curr) => {
+                    return acc + curr.price * curr.quantity;
+                },
+                0
+            );
 
             await dispatchData({
                 type: "SET_DATA",
@@ -238,10 +263,11 @@ export default function DataContextProvider({ children }) {
                 },
             });
         } catch (err) {
-            console.log("error here1",err);
+            console.log("error here1", err);
         }
     };
 
+    // load address
     const addressHandler = async (address, type) => {
         const { user } = dataContext;
         const key = await AsyncStorage.getItem("@acc_token");
@@ -263,22 +289,22 @@ export default function DataContextProvider({ children }) {
                 const data = await response.json();
                 const { result } = data;
                 console.log(result);
-                const payload =await [data.result, ...dataState.address];
+                const payload = await [data.result, ...dataState.address];
                 await dispatchData({ type: "ADD_ADDRESS", payload });
             }
         } catch (err) {
-            console.log("error here 7",err);
+            console.log("error here 7", err);
         }
     };
+
+    // manage order
     const orderHandler = async (details, type) => {
-        const detailsData = { ...details,createdAt:new Date() };
+        const detailsData = { ...details, createdAt: new Date() };
         const { user } = dataContext;
         const key = await AsyncStorage.getItem("@acc_token");
         try {
             let response = {};
             if (type === "add") {
-         
-
                 await fetch("http://192.168.0.105:5000/cart/all", {
                     method: "DELETE",
                     headers: {
@@ -299,14 +325,15 @@ export default function DataContextProvider({ children }) {
                 });
 
                 const data = await response.json();
-                const payload =await data.result;
+                const payload = await data.result;
                 await dispatchData({ type: "ADD_ORDER", payload });
             }
         } catch (err) {
-            console.log("error here8",err);
+            console.log("error here8", err);
         }
     };
 
+    // logout function
     const logOut = async () => {
         try {
             // remove user data
@@ -314,13 +341,13 @@ export default function DataContextProvider({ children }) {
             // remove data,cart dataaddress data, orders data
             await dispatchData({ type: "REMOVE_DATA" });
         } catch (err) {
-            console.log("error here 9",err);
+            console.log("error here 9", err);
         }
     };
 
+    // login function
     const logIn = async (data) => {
         try {
-            
             // check  if access token ccessexists
             const key = await AsyncStorage.getItem("@acc_token");
             if (key) {
@@ -328,30 +355,32 @@ export default function DataContextProvider({ children }) {
                 await AsyncStorage.removeItem("@acc_token");
             }
             // get user id
-            const {_id:userId} = data.user;
-            
+            const { _id: userId } = data.user;
 
             // add access token
             await AsyncStorage.setItem("@acc_token", data.access_token);
             // remove data,cart dataaddress data, orders data
             await dispatchData({ type: "REMOVE_DATA" });
-            
-                 // fetching cart data,address data ,orders data
-                 const result = await fetch("http://192.168.0.105:5000/user/data", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${key}`,
-                    },
-                    body: JSON.stringify({ user: userId}),
-                });
-        
-                const allData = await result.json();
-                const finalResult =await allData.result;
 
-            const totalCartAmount =await finalResult.cart.reduce((acc, curr) => {
-                return acc + curr.price * curr.quantity;
-            }, 0);
+            // fetching cart data,address data ,orders data
+            const result = await fetch("http://192.168.0.105:5000/user/data", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${key}`,
+                },
+                body: JSON.stringify({ user: userId }),
+            });
+
+            const allData = await result.json();
+            const finalResult = await allData.result;
+
+            const totalCartAmount = await finalResult.cart.reduce(
+                (acc, curr) => {
+                    return acc + curr.price * curr.quantity;
+                },
+                0
+            );
             // update state
             await dispatchData({
                 type: "LOGGED_IN",
@@ -365,12 +394,65 @@ export default function DataContextProvider({ children }) {
 
             // add user data
             await dataContext.onLogIn(data.user);
-            
         } catch (err) {
-            console.log("error here 10",err);
+            console.log("error here 10", err);
         }
     };
 
+    // remove an address
+    const removeAddressHandler = async (id) => {
+        try {
+            const key = await AsyncStorage.getItem("@acc_token");
+            await fetch(`http://192.168.0.105:5000/address/delete/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${key}`,
+                },
+            });
+            const { address } = dataState;
+            const newAddress = address.filter((item) => item._id !== id);
+            await dispatchData({ type: "REMOVE_ADDRESS", payload: newAddress });
+        } catch (err) {
+            console.log("error here 14", err);
+        }
+    };
+
+    // update old address
+    const updateAddressHandler = async (newAddress, id) => {
+        try {
+            const key = await AsyncStorage.getItem("@acc_token");
+            const result = await fetch(
+                `http://192.168.0.105:5000/address/update/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${key}`,
+                    },
+                    body: JSON.stringify(newAddress),
+                }
+            );
+            const data = await result.json();
+            const output = await data.result;
+
+            const { address } = dataState;
+
+            let filteredAddress = await address.filter(
+                (item) => item._id !== id
+            );
+            await filteredAddress.push(output);
+
+            await dispatchData({
+                type: "EDIT_ADDRESS",
+                payload: filteredAddress,
+            });
+        } catch (err) {
+            console.log("error here 15", err);
+        }
+    };
+    
+    // start of customer
     const state = {
         cart: dataState.cart,
         orders: dataState.orders,
@@ -390,6 +472,8 @@ export default function DataContextProvider({ children }) {
         orderHandler: orderHandler,
         logOutHandler: logOut,
         logInHandler: logIn,
+        removeAddress: removeAddressHandler,
+        editAddress: updateAddressHandler,
     };
 
     return (

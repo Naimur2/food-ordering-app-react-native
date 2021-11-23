@@ -4,16 +4,13 @@ import {
     Text,
     View,
     ScrollView,
-    TouchableOpacity
+    TouchableOpacity,
 } from "react-native";
 import AdminContext from "../../../contexts/admin-context";
 import { Icon } from "react-native-elements";
 
-
 export default function CategoriesScreen() {
     const { categories } = useContext(AdminContext);
-
-
 
     return (
         <ScrollView style={styles.container}>
@@ -48,24 +45,23 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginVertical: 5,
         borderRadius: 10,
-         borderColor: "#ddd",
-         borderBottomWidth: 0,
-         shadowColor: "#000",
-         shadowOffset: { width: 0, height: 2 },
-         shadowOpacity: 0.8,
-         shadowRadius: 2,
-         elevation: 1,
-         justifyContent: "space-between",
-         flexDirection: "row",
-         alignItems: "center",
-
+        borderColor: "#ddd",
+        borderBottomWidth: 0,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+        elevation: 1,
+        justifyContent: "space-between",
+        flexDirection: "row",
+        alignItems: "center",
     },
-    updateContainer:{
-         flexDirection:"row",
-         justifyContent:"space-between",
-         alignItems:"center",
+    updateContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
-    btn:{
-         padding:5,
-    }
+    btn: {
+        padding: 5,
+    },
 });

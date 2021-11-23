@@ -1,12 +1,22 @@
 import React, { useEffect, useContext, useState } from "react";
-import { ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import {RefreshControl, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import PressAbleButton from "../components/PressAbleButton";
 
 import CustomerContext from "../../../../contexts/customer-context";
 import FoodListMaker from "./FoodDetails/FoodListMaker";
 
+
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  }
+
+
+
+
 export default function HomeScreen({ navigation }) {
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [refreshing, setRefreshing] = React.useState(false);
+
     const cusCtx = useContext(CustomerContext);
 
     const categoryChangeHandler = (item) => {
@@ -57,7 +67,11 @@ export default function HomeScreen({ navigation }) {
    
     const DATA = getData(cusCtx.items, cusCtx.category);
 
-    
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        console.log("refreshing");
+        wait(2000).then(() => setRefreshing(false));
+      }, []);
 
     return (
         <>
@@ -77,6 +91,12 @@ export default function HomeScreen({ navigation }) {
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
                 contentContainerStyle={styles.pill}
+                refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                  }
             >
                 <RenderCatagory />
             </ScrollView>

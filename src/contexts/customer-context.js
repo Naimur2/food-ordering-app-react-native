@@ -19,6 +19,8 @@ const CustomerContext = React.createContext({
     orderHandler:()=>{},
     logInHandler:()=>{},
     logOutHandler:()=>{},
+    removeAddress:()=>{},
+    editAddress:()=>{},
 });
 
 export default CustomerContext;

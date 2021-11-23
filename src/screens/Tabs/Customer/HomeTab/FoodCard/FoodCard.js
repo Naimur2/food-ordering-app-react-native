@@ -38,9 +38,13 @@ const styles = StyleSheet.create({
         shadowRadius: 1.0,
         elevation: 1,
         height: 120,
+        alignItems: "center",
     },
     image: {
-        width: 120,
-        height: "auto",
+        width: 80,
+        height:80,
+        borderRadius: 10,
+        resizeMode:'contain'
+        
     },
 });

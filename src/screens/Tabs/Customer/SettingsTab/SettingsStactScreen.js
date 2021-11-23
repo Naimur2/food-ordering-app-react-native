@@ -7,6 +7,7 @@ import OrdersScreen from "./OrdersScreen";
 import OrderDetails from "./OrderDetails";
 import AddressTab from "./AddressTab";
 import MyAccountScreen from "./MyAccountScreen";
+import EditAddress from "./EditAddressTab";
 
 const SettingsStack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ export default function SettingsStackScreen() {
             <SettingsStack.Screen name="Orders" component={OrdersScreen} />
             <SettingsStack.Screen name="OrderDetails" component={OrderDetails} />
             <SettingsStack.Screen name="MyAccount" component={MyAccountScreen} />
+            <SettingsStack.Screen name="EditAddress" component={EditAddress} />
         </SettingsStack.Navigator>
     );
 }

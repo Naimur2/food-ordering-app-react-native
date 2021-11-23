@@ -34,7 +34,8 @@ export default function RootNavigator() {
                     );
                     const { result } = await response.json();
                     const data = await { access_token: key, user: result };
-                    if (result.role === "customer") {
+
+                    if (result.role === "customer" ) {
                         customerCtx.logInHandler(data);
                     }
                     if (result.role === "admin") {

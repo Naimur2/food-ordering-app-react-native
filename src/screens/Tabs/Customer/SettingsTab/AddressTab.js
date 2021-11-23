@@ -5,12 +5,37 @@ import {
     View,
     ScrollView,
     TouchableOpacity,
+    Alert
 } from "react-native";
 import CustomerContext from "../../../../contexts/customer-context";
 import { Icon, Button } from "react-native-elements";
 
 export default function CategoriesScreen({ navigation }) {
-    const { address } = useContext(CustomerContext);
+    const customrCtx = useContext(CustomerContext);
+    const {address} = customrCtx;
+
+    const deleteAddress = (id) => {
+        Alert.alert(
+            "Error",
+            "Are you Sure to delete this address?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => {}, // or do something,
+                    style: "cancel",
+                },
+                {
+                    text: "OK",
+                    onPress: () => customrCtx.removeAddress(id), // or do something,
+                    style: "cancel",
+                },
+            ],
+            {
+                cancelable: true,
+                onDismiss: () => {},
+            }
+        );
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -35,10 +60,12 @@ export default function CategoriesScreen({ navigation }) {
                         <Text>City: Dhaka</Text>
                     </View>
                     <View style={styles.updateContainer}>
-                        <TouchableOpacity style={styles.btn} onPress={() => {}}>
+                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('EditAddress',{
+                            value:item,
+                        })}>
                             <Icon name="edit" />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.btn} onPress={() => {}}>
+                        <TouchableOpacity style={styles.btn} onPress={() => deleteAddress(item._id)}>
                             <Icon name="delete" />
                         </TouchableOpacity>
                     </View>

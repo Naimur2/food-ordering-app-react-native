@@ -23,10 +23,10 @@ export default function LoginScreen({ navigation }) {
     const customerContext = React.useContext(CustomerContext);
     const adminCtx = React.useContext(AdminContext);
 
-    const showAlert = () =>
+    const showAlert = () => {
         Alert.alert(
             "Error",
-            "Please Try a Different Email.",
+            "Invalid input's.",
             [
                 {
                     text: "OK",
@@ -39,6 +39,7 @@ export default function LoginScreen({ navigation }) {
                 onDismiss: () => setError(null),
             }
         );
+    };
 
     const dataCtx = React.useContext(DataContext);
 
@@ -75,7 +76,7 @@ export default function LoginScreen({ navigation }) {
 
             setIsLoading(false);
         } catch (err) {
-            console.log("error here 13",err);
+            console.log("error here 13", err);
             setIsLoading(false);
         }
     };
@@ -193,6 +194,7 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#fff",
     },
     inner: {
         padding: 24,

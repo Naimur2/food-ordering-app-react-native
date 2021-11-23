@@ -14,7 +14,7 @@ import {
 import { Button, Icon, Input } from "react-native-elements";
 import * as yup from "yup";
 
-export default function AddNewAddress({ navigation }) {
+export default function EditAddress({ navigation,route }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -35,9 +35,14 @@ export default function AddNewAddress({ navigation }) {
             }
         );
 const customerCtx= useContext(CustomerContext);
+const {value} = route.params;
+
+
+
     const formHandler = async (values) => {
         const address = { ...values,city:"dhaka" };
-        await customerCtx.updateAddress(address,"add");
+        await customerCtx.editAddress(address,value._id);
+        await Alert.alert("Address Updated Successfully");
         await navigation.goBack();
     };
 
@@ -125,11 +130,11 @@ const customerCtx= useContext(CustomerContext);
                     style={styles.inner}
                     validationSchema={addressValidationSchema}
                     initialValues={{
-                        name: "",
-                        city: "",
-                        addressline1: "",
-                        addressline2: "",
-                        phone: "",
+                        name: value.name,
+                        city: "Dhaka",
+                        addressline1:value.addressline1,
+                        addressline2: value.addressline2,
+                        phone: value.phone,
                     }}
                     onSubmit={formHandler}
                 >
@@ -170,11 +175,9 @@ const customerCtx= useContext(CustomerContext);
                             ))}
 
                             <View style={styles.buttonContainer}>
-                                <Button onPress={handleSubmit} title="Add New Address" />
+                                <Button onPress={handleSubmit} title="Save Changes" />
                             </View>
-                            <View style={styles.buttonContainer}>
-                                <Button buttonStyle={{backgroundColor:'red'}} onPress={()=> navigation.goBack() } title="Cancel" />
-                            </View>
+                           
                         </ScrollView>
                     )}
                 </Formik>
